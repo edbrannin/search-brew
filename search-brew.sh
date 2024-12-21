@@ -27,9 +27,9 @@ get_json cask
 
 echo Formulas
 echo ========
-jq -r '.[] | select([.name, .desc] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.name, .desc, .homepage, ""] | join("\n")' < formula.json
+jq -r '.[] | select([.name, .desc, .homepage] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.name, .desc, .homepage, ""] | join("\n")' < formula.json
 
 echo Casks
 echo =====
-jq -r '.[] | select([.token, .name[0], .desc] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.token, .name[0], .desc, .homepage, ""] | join("\n")' < cask.json
+jq -r '.[] | select([.token, .name[0], .desc, .homepage] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.token, .name[0], .desc, .homepage, ""] | join("\n")' < cask.json
 
