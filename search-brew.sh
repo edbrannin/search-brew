@@ -29,11 +29,74 @@ get_json cask
 # - [ ] Note if package is installed already
 #     - (Would probably involve rewrite in python)
 
+function installed_json() {
+  # Run "brew ls -1 formula" (or cask) and turn it into an object like
+  # {"bash": "bash", "screen": "screen"}
+  if ! [ "$1" = "formula" ] || [ "$1" = "cask" ]; then
+    echo "Usage: one of:"
+    echo "  installed_json formula"
+    echo "  installed_json cask"
+    return
+  fi
+  brew ls -1 "--${1}" | jq -R . | jq --slurp 'INDEX(.)'
+}
+
 echo Formulas
 echo ========
-jq -r '.[] | select([.name, .desc, .homepage] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.name, .desc, .homepage, ""] | join("\n")' < formula.json
+jq -rn 'input as $formulae
+  | input as $installed
+  | $formulae
+  | .[]
+  # Search name, description, website
+  | select(
+    [.name, .desc, .homepage]
+    | join(" ")
+    | ascii_downcase
+    | test("'"${*}"'" | ascii_downcase)?
+    )
+  # Output
+  | [
+    .name + (
+      # Add "✓" for installed packages
+      if (.name | in($installed))
+        then " ✓"
+        else ""
+      end
+      ),
+    .desc,
+    .homepage,
+    ""
+    ]
+  | join("\n")' formula.json <(installed_json formula)
+
+echo
 
 echo Casks
 echo =====
-jq -r '.[] | select([.token, .name[0], .desc, .homepage] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.token, .name[0], .desc, .homepage, ""] | join("\n")' < cask.json
+jq -rn 'input as $casks
+  | input as $installed
+  | $casks
+  | .[]
+  # search package name, human name, description, website
+  | select(
+    [.token, .name[0], .desc, .homepage]
+    | join(" ")
+    | ascii_downcase
+    | test("'"${*}"'" | ascii_downcase)?
+    )
+  # Output
+  | [
+    .token + (
+      # Add "✓" for installed packages
+      if (.token | in($installed))
+        then " ✓"
+        else ""
+      end
+      ),
+    .name[0],
+    .desc,
+    .homepage,
+    ""
+    ]
+  | join("\n")' cask.json <(installed_json cask)
 
