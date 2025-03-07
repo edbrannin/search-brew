@@ -25,10 +25,6 @@ function get_json() {
 get_json formula
 get_json cask
 
-# Future work:
-# - [ ] Note if package is installed already
-#     - (Would probably involve rewrite in python)
-
 function installed_json() {
   # Run "brew ls -1 formula" (or cask) and turn it into an object like
   # {"bash": "bash", "screen": "screen"}
