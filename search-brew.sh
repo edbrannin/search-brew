@@ -25,6 +25,10 @@ function get_json() {
 get_json formula
 get_json cask
 
+# Future work:
+# - [ ] Note if package is installed already
+#     - (Would probably involve rewrite in python)
+
 echo Formulas
 echo ========
 jq -r '.[] | select([.name, .desc, .homepage] | join(" ") | ascii_downcase | test("'"${*}"'" | ascii_downcase)?) | [.name, .desc, .homepage, ""] | join("\n")' < formula.json
