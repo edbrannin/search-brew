@@ -28,10 +28,13 @@ get_json cask
 function installed_json() {
   # Run "brew ls -1 formula" (or cask) and turn it into an object like
   # {"bash": "bash", "screen": "screen"}
-  if ! [ "$1" = "formula" ] || [ "$1" = "cask" ]; then
-    echo "Usage: one of:"
-    echo "  installed_json formula"
-    echo "  installed_json cask"
+  if ! [ "$1" = "formula" ] && ! [ "$1" = "cask" ]; then
+    >&2 echo "Usage: one of:"
+    >&2 echo "  installed_json formula"
+    >&2 echo "  installed_json cask"
+    >&2 echo
+    # >&2 echo Args: "$@"
+    # >&2 echo Arg 1: "\"$1\""
     return
   fi
   brew ls -1 "--${1}" | jq -R . | jq --slurp 'INDEX(.)'
